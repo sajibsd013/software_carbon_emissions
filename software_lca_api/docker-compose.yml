@@ -1,0 +1,17 @@
+services:
+  api:
+    build: .
+    container_name: carbon_api_service
+    ports:
+      - "8000:8000"
+    environment:
+      # Optional: Pass a GitHub token as an environment variable
+      # This allows you to securely inject the token via a .env file later
+      - GITHUB_TOKEN=${GITHUB_TOKEN:-}
+    volumes:
+      # Mounts your local directory into the container.
+      # This enables "hot reloading" so any code changes you make 
+      # locally are immediately reflected inside the running container.
+      - .:/app
+    # Overrides the Dockerfile CMD to include the --reload flag for development
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
