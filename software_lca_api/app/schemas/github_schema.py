@@ -1,14 +1,18 @@
 from pydantic import BaseModel, Field
 
 class GitHubDataRequest(BaseModel):
-    repo_name: str = Field(..., example="django/django")
-    days: int = Field(30, ge=1, le=365, description="Timeframe to analyze")
+    owner: str = Field(..., example="axios")
+    repo: str = Field(..., example="axios")
+    months: int = Field(12, ge=1, le=36, description="Timeframe to analyze")
 
 class ProjectMetrics(BaseModel):
     status: str
-    repo_name: str = Field(..., example="django/django")
-    repo_size_mb: float = Field(..., example=273.2900390625)
-    monthly_commits: int = Field(..., example=106)
-    active_contributors: int = Field(..., example=33)
-    ci_runs_per_month: int = Field(..., example=9375)
-    ci_avg_duration_min: float = Field(..., example= 0.878275555555541)
+    owner: str 
+    repo: str 
+    repo_size_gb: float 
+    total_commits: int 
+    avg_monthly_active_contributors: int 
+    total_contributors: int 
+    total_ci_runs: float
+    total_ci_duration_minutes: float
+    avg_artifact_size_gb: float

@@ -8,14 +8,14 @@ router = APIRouter()
 @router.post("/github-data", response_model=ProjectMetrics)
 async def get_github_data(request: GitHubDataRequest):
     try:
-        print(f"Received request for repo: {request.repo_name} with days: {request.days}")  
-        print(f"settings.GITHUB_TOKEN: {settings.GITHUB_TOKEN}")  # Debugging: Check if the token is loaded correctly
+        print(f"Received request for repo: {request.repo} with months: {request.months}")  
         fetcher = GitHubDataFetcher(
-            repo_name=request.repo_name,
-            token=settings.GITHUB_TOKEN,
-            days=request.days
+            repo = request.repo,
+            owner=request.owner,
+            api_token=settings.GITHUB_TOKEN,
+            months=request.months
         )
-        project_data = await fetcher.get_all_data()
+        project_data = await fetcher.get_project_data()
         return {
             "status": "success",
             **project_data

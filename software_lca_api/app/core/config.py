@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Software LCA API"
+    PROJECT_NAME: str = "Software Carbon Emissions API"
     VERSION: str = "1.0.0"
     GITHUB_TOKEN: str
 
