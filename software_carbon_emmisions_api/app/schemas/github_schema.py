@@ -13,6 +13,6 @@ class ProjectMetrics(BaseModel):
     total_commits: int 
     avg_monthly_active_contributors: int 
     total_contributors: int 
-    total_ci_runs: float
+    total_ci_runs: int
     total_ci_duration_minutes: float
     avg_artifact_size_gb: float

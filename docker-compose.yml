@@ -1,13 +1,13 @@
 services:
   api:
     build:
-      context: ./software_lca_api
+      context: ./software_carbon_emmisions_api
     ports:
       - "8000:8000"
     env_file:
-      - ./software_lca_api/.env
+      - ./software_carbon_emmisions_api/.env
     environment:
       - PYTHONPATH=/app
     volumes:
-      - ./software_lca_api:/app
+      - ./software_carbon_emmisions_api:/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload

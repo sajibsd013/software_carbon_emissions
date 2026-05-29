@@ -7,7 +7,7 @@ from dateutil.relativedelta import relativedelta
 from dateutil import parser
 from collections import defaultdict
 import time
-from math import ceil, isnan
+from math import ceil
 
 from collections import defaultdict
 from math import ceil
@@ -15,9 +15,6 @@ from datetime import datetime, timezone, timedelta
 from dateutil.relativedelta import relativedelta
 from dateutil import parser
 
-import asyncio
-import httpx
-import time
 
 
 class GitHubDataFetcher:
