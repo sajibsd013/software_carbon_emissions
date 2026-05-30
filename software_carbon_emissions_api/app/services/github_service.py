@@ -309,7 +309,7 @@ class GitHubDataFetcher:
             else 0.0
         )
 
-async def get_project_data(self):
+    async def get_project_data(self):
         try:
             async with httpx.AsyncClient(timeout=30.0) as client:
                 await self.__get_repo_size(client)

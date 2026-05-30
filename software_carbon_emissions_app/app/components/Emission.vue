@@ -44,7 +44,9 @@
 
     <div class="panel p-4.5">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xs font-semibold text-[#6b7c6b] uppercase tracking-wider mb-0">Basic Data</h3>
+        <h3 class="text-xs font-semibold text-[#6b7c6b] uppercase tracking-wider mb-0">Basic Data
+          <span class="ml-1 text-gray-400 normal-case">{{ repoLabel ? `for ${repoLabel}` : '' }}</span>
+        </h3>
 
         <button @click="isModalOpen = true"
           class="text-xs font-medium bg-[#f5f7f5] border border-[#e2e8e2] px-3 py-1.5 rounded hover:bg-[#e2e8e2] transition-colors flex items-center gap-1.5">
@@ -56,7 +58,7 @@
         </button>
       </div>
 
-      <div class="grid grid-cols-3 gap-2.5">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-2.5">
         <div>
           <label class="field-label">Months</label>
           <input v-model.number="formData.months" type="number" class="input-field" />
@@ -223,7 +225,22 @@
         </div>
       </div>
 
+      <div class="mt-6 flex justify-center">
+        <button @click="handleCalculateEmissions" :disabled="loading"
+          class="btn-primary py-30 flex items-center justify-center gap-1.75">
+          <span v-if="loading" class="spinner"></span>
+          <span v-if="!loading">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
+            </svg>
+
+          </span>
+          Calculate Emissions
+        </button>
+      </div>
       <hr class="divider">
+
+      <ResultsPanel :results="results" :repo-label="repoLabel" />
     </div>
     <Toast ref="toastRef" />
     <GithubLoader :isLoading="loading" />
@@ -240,33 +257,35 @@ const showAssumptions = ref(true);
 const isModalOpen = ref(false);
 const loading = ref(false);
 
+const repoLabel = ref('');
+
 const formData = reactive({
   owner: '',
   repo: '',
-  months: 12,
-  repo_size_gb: '',
-  avg_monthly_active_contributors: '',
-  total_ci_runs: '',
-  total_ci_duration_minutes: '',
-  total_commits: '',
-  total_deployments: '',
-  deployment_duration_minutes: '',
-  cloud_region: '',
-  monthly_active_users: '',
-  avg_monthly_usage_hours_per_user: '',
-  avg_monthly_data_transfer_gb: '',
-  db_migration_gb: '',
-  docker_image_size_gb: '',
-  dependency_size_gb: '',
-  server_uptime_hours_per_month: '',
-  avg_artifact_size_gb: 12,
+  months: 12, 
+  repo_size_gb: 0.85, 
+  avg_monthly_active_contributors: 14, 
+  total_ci_runs: 1450,
+  total_ci_duration_minutes: 17400, 
+  total_commits: 1250, 
+  total_deployments: 180, 
+  deployment_duration_minutes: 1440, 
+  cloud_region: 'us-east-1', 
+  monthly_active_users: 45000, 
+  avg_monthly_usage_hours_per_user: 18.5, 
+  avg_monthly_data_transfer_gb: 1250.5, 
+  db_migration_gb: 4.5, 
+  docker_image_size_gb: 1.15, 
+  dependency_size_gb: 0.65, 
+  server_uptime_hours_per_month: 730, 
+  avg_artifact_size_gb: 0.12, 
   assumptions: {
-    CLIENT_DESKTOP_PERCENT: 25,
-    CLIENT_LAPTOP_PERCENT: 30,
-    CLIENT_MOBILE_OR_TAB_PERCENT: 45,
-    DEVELOPER_DESKTOP_PERCENT: 25,
-    DEVELOPER_LAPTOP_PERCENT: 75,
-    DEVELOPER_WORK_HOURS_PER_MONTH: 160
+    CLIENT_DESKTOP_PERCENT: 35, 
+    CLIENT_LAPTOP_PERCENT: 45, 
+    CLIENT_MOBILE_OR_TAB_PERCENT: 20, 
+    DEVELOPER_DESKTOP_PERCENT: 15, 
+    DEVELOPER_LAPTOP_PERCENT: 85, 
+    DEVELOPER_WORK_HOURS_PER_MONTH: 160 
   }
 });
 
@@ -306,6 +325,8 @@ const handleFetchGithub = async () => {
     formData.total_commits = responseData.total_commits;
     formData.avg_artifact_size_gb = responseData.avg_artifact_size_gb;
 
+    repoLabel.value = `${owner}/${repo}`;
+
     isModalOpen.value = false;
     loading.value = false;
     showToast('GitHub data fetched!', 'success');
@@ -315,6 +336,47 @@ const handleFetchGithub = async () => {
     loading.value = false;
     isModalOpen.value = false;
 
+  }
+};
+
+
+const results = ref(null);
+
+const handleCalculateEmissions = async () => {
+
+  loading.value = true;
+  try {
+    const payload = {
+      ...formData,
+    };
+
+    payload.assumptions = {
+      CLIENT_DESKTOP_PERCENT: formData.assumptions.CLIENT_DESKTOP_PERCENT / 100,
+      CLIENT_LAPTOP_PERCENT: formData.assumptions.CLIENT_LAPTOP_PERCENT / 100,
+      CLIENT_MOBILE_OR_TAB_PERCENT: formData.assumptions.CLIENT_MOBILE_OR_TAB_PERCENT / 100,
+      DEVELOPER_DESKTOP_PERCENT: formData.assumptions.DEVELOPER_DESKTOP_PERCENT / 100,
+      DEVELOPER_LAPTOP_PERCENT: formData.assumptions.DEVELOPER_LAPTOP_PERCENT / 100,
+      DEVELOPER_WORK_HOURS_PER_MONTH: formData.assumptions.DEVELOPER_WORK_HOURS_PER_MONTH
+
+    };
+
+    const res = await fetch(`${BASE_URL}/api/v1/calculate-emissions`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    if (data.status !== 'success') throw new Error('API error');
+
+    results.value = data.results;
+    showToast('Emissions calculated!', 'success');
+  } catch (e) {
+    showToast('Calculation failed: ' + e.message);
+  } finally {
+    loading.value = false;
   }
 };
 </script>
