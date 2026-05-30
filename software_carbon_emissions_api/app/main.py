@@ -2,11 +2,20 @@ from fastapi import FastAPI
 from app.core.config import settings
 from app.api.v1 import github
 from app.api.v1 import software_carbon_emmisions
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version=settings.VERSION,
     description="Separated microservices for GitHub data collection and Carbon Emissions calculation."
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # production এ specific domain দিও
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Include the routers from our modular files

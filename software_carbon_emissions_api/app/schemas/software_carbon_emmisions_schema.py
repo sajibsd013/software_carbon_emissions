@@ -1,35 +1,6 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Dict
 
-"""
-        Expected kwargs:
-
-        Development Phase (mandatory):
-            - months (int/float)
-            - repo_size_gb (float)
-            - avg_monthly_active_contributors (int)
-            - total_ci_runs (int)
-            - total_ci_duration_minutes (float)
-            - total_commits (int)
-
-        Deployment Phase (mandatory):
-            - total_deployments (int)
-            - deployment_duration_minutes (float)
-            - cloud_region (str)
-
-        Usage Phase (mandatory):
-            - monthly_active_users (int/float)  
-            - avg_monthly_usage_hours_per_user (float)
-            - avg_monthly_data_transfer_gb (float) — avg GB transferred per user per month (up + down)
-
-        Optional:
-            - db_migration_gb (float)                  — default 0.0
-            - docker_image_size_gb (float)             — default 0.0
-            - dependency_size_gb (float)               — default 0.0
-            - server_uptime_hours_per_month (float)    — default 0.0
-            - server_instance_power_w (float)          — default 0.0
-            - assumptions (dict)                       — override any constant
-"""
 
 class SoftwareCarbonEmissionRequest(BaseModel):
     # Development Phase
@@ -39,6 +10,7 @@ class SoftwareCarbonEmissionRequest(BaseModel):
     total_ci_runs: int = Field(8634, ge=0, description="Total number of CI runs")
     total_ci_duration_minutes: float = Field(12771.733333 	, ge=0, description="Total duration of CI runs in minutes")
     total_commits: int = Field(8634, ge=0, description="Total number of commits")
+    avg_artifact_size_gb: float = Field(0.000580, ge=0, description="Average size of artifacts in GB")
 
     # Deployment Phase
     total_deployments: int = Field(12, ge=0, description="Total number of deployments")
@@ -64,7 +36,6 @@ class SoftwareCarbonEmissionRequest(BaseModel):
             'DEVELOPER_DESKTOP_PERCENT': 0.25,
             'DEVELOPER_LAPTOP_AVG_POWER_W': 45,
             'DEVELOPER_DESKTOP_AVG_POWER_W': 250,
-            'ARTIFACT_SIZE': 0.000580,
             'DEVELOPER_WORK_HOURS_PER_MONTH': 10,
             'CLIENT_LAPTOP_PERCENT': 0.45,
             'CLIENT_DESKTOP_PERCENT': 0.25,

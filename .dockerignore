@@ -1,0 +1,44 @@
+
+# General
+.git
+.gitignore
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+
+# Node / frontend
+node_modules/
+dist/
+build/
+coverage/
+.next/
+.nuxt/
+.svelte-kit/
+
+# .NET / Java / Go / other build outputs
+bin/
+obj/
+target/
+out/
+*.class
+*.jar
+*.war
+*.ear
+
+# Docker and editor files
+Dockerfile
+docker-compose*.yml
+.vscode/
+.idea/

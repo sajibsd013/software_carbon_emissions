@@ -16,6 +16,8 @@ from dateutil.relativedelta import relativedelta
 from dateutil import parser
 
 
+class GitHubFetchError(Exception):
+    pass
 
 class GitHubDataFetcher:
 
@@ -40,33 +42,17 @@ class GitHubDataFetcher:
             "avg_artifact_size_gb": None,
         }
 
-    async def __make_request(
-        self,
-        client: httpx.AsyncClient,
-        url,
-        params=None
-    ):
+    async def __make_request(self, client: httpx.AsyncClient, url, params=None):
+        response = await client.get(
+            url,
+            headers=self.__headers,
+            params=params
+        )
 
-        while True:
+        if response.status_code in [403, 404, 429]:
+            raise GitHubFetchError(f"Fatal Error: Received status {response.status_code} for {url}. Terminating immediately.")
 
-            response = await client.get(
-                url,
-                headers=self.__headers,
-                params=params
-            )
-
-            if response.status_code in [403, 429]:
-                remaining = response.headers.get("X-RateLimit-Remaining")
-
-                if remaining and int(remaining) == 0:
-
-                    reset_time = int(response.headers["X-RateLimit-Reset"])
-                    sleep_time = (max(0,reset_time - int(time.time())) + 5)
-
-                    print(f"Rate limit exceeded. "f"Sleeping {sleep_time}s")
-                    await asyncio.sleep(sleep_time)
-                    continue
-            return response
+        return response
 
     async def __get_repo_size(self,client: httpx.AsyncClient):
 
@@ -323,19 +309,21 @@ class GitHubDataFetcher:
             else 0.0
         )
 
-    async def get_project_data(self):
+async def get_project_data(self):
+        try:
+            async with httpx.AsyncClient(timeout=30.0) as client:
+                await self.__get_repo_size(client)
+                branches = await self.__get_branches(client)
+                all_commits = await self.__get_commits(client, branches)
+                await self.__get_contributors(all_commits)
+                
+                await asyncio.gather(
+                    self.__get_ci_cd_data(client),
+                    self.__get_dynamic_artifact_size(client),
+                )
+            
+            return self.project_data
 
-        async with httpx.AsyncClient(
-            timeout=30.0
-        ) as client:
-
-            await self.__get_repo_size(client)
-            branches = await self.__get_branches(client)
-            all_commits = await self.__get_commits(client,branches)
-            await self.__get_contributors(all_commits)
-            await asyncio.gather(
-                self.__get_ci_cd_data(client),
-                self.__get_dynamic_artifact_size(client),
-            )
-
-        return self.project_data
+        except GitHubFetchError as e:
+            print(f"Process Aborted: {e}")
+            return {"error": str(e)}

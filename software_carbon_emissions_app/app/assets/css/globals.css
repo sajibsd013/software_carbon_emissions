@@ -1,0 +1,266 @@
+@import 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap';
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f5f7f5;
+  color: #1a2e1a;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+.panel {
+  background: #ffffff;
+  border: 1px solid #e2e8e2;
+  border-radius: 10px;
+}
+
+.btn-primary {
+  background: #16a34a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 13px;
+  border-radius: 7px;
+  transition: background 0.15s, box-shadow 0.15s;
+  cursor: pointer;
+  border: none;
+  padding: 9px 16px;
+}
+
+.btn-primary:hover {
+  background: #15803d;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.25);
+}
+
+.btn-primary:active {
+  background: #166534;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.tab-pill {
+  font-size: 12.5px;
+  font-weight: 500;
+  border-radius: 6px;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: all 0.15s;
+  color: #6b7c6b;
+  background: transparent;
+  border: none;
+}
+
+.tab-pill.active {
+  background: #16a34a;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(22, 163, 74, 0.3);
+}
+
+.tab-pill:not(.active):hover {
+  color: #16a34a;
+}
+
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6b7c6b;
+  margin-bottom: 3px;
+  /* text-transform: uppercase; */
+  letter-spacing: 0.04em;
+}
+
+.input-field {
+  width: 100%;
+  padding: 7px 10px;
+  border: 1px solid #d1dbd1;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: #1a2e1a;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-field:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+}
+
+select.input-field {
+  cursor: pointer;
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid #e8eee8;
+  margin: 14px 0;
+}
+
+.metric-card {
+  background: #f5f7f5;
+  border: 1px solid #e2e8e2;
+  border-radius: 8px;
+  padding: 14px 12px;
+}
+
+.metric-value {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+  color: #15803d;
+}
+
+.metric-label {
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7c6b;
+  /* text-transform: uppercase; */
+  letter-spacing: 0.06em;
+  margin-top: 5px;
+}
+
+.phase-bar {
+  height: 7px;
+  border-radius: 4px;
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.bar-track {
+  background: #e8eee8;
+  border-radius: 4px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.gh-preview {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.fade-in {
+  animation: fadeUp 0.35s ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  z-index: 999;
+  max-width: 320px;
+}
+
+.toast-error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+}
+
+.toast-success {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
+}
+
+.result-section {
+  display: none;
+}
+
+.result-section.visible {
+  display: block;
+}
+
+.breakdown-row {
+  border-bottom: 1px solid #e8eee8;
+}
+
+.breakdown-row:last-child {
+  border-bottom: none;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f7f5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1dbd1;
+  border-radius: 3px;
+}
+
+.chevron {
+  transition: transform 0.2s;
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
+optgroup {
+  font-weight: 600;
+  color: #374151;
+}
+
+option {
+  font-weight: 400;
+  color: #1a2e1a;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse {
+  animation: pulse 2s infinite;
+}

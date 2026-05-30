@@ -13,6 +13,7 @@ class SoftwareCarbonEmission:
             - total_ci_runs (int)
             - total_ci_duration_minutes (float)
             - total_commits (int)
+            - avg_artifact_size_gb (float)
 
         Deployment Phase (mandatory):
             - total_deployments (int)
@@ -29,7 +30,6 @@ class SoftwareCarbonEmission:
             - docker_image_size_gb (float)             — default 0.0
             - dependency_size_gb (float)               — default 0.0
             - server_uptime_hours_per_month (float)    — default 0.0
-            - server_instance_power_w (float)          — default 0.0
             - assumptions (dict)                       — override any constant
         """
         try:
@@ -55,11 +55,11 @@ class SoftwareCarbonEmission:
             raise ValueError(f"Missing mandatory parameter: {e}")
 
         # ── Optional Parameters ────────────────────────────────────────────────
-        self.db_migration_gb               = kwargs.get('db_migration_gb', 0.0)
-        self.docker_image_size_gb          = kwargs.get('docker_image_size_gb', 0.0)
-        self.dependency_size_gb            = kwargs.get('dependency_size_gb', 0.0)
+        self.avg_artifact_size_gb = kwargs.get('avg_artifact_size_gb', 0.0)
+        self.db_migration_gb = kwargs.get('db_migration_gb', 0.0)
+        self.docker_image_size_gb = kwargs.get('docker_image_size_gb', 0.0)
+        self.dependency_size_gb = kwargs.get('dependency_size_gb', 0.0)
         self.server_uptime_hours_per_month = kwargs.get('server_uptime_hours_per_month', 0.0)
-        self.server_instance_power_w       = kwargs.get('server_instance_power_w', 0.0)
 
         assumptions = kwargs.get('assumptions', {})
 
@@ -75,20 +75,14 @@ class SoftwareCarbonEmission:
         self.DEVELOPER_DESKTOP_PERCENT = self.__get_numeric_assumption(assumptions, 'DEVELOPER_DESKTOP_PERCENT', 0.25)
         self.DEVELOPER_LAPTOP_AVG_POWER_W = self.__get_numeric_assumption(assumptions, 'DEVELOPER_LAPTOP_AVG_POWER_W', 45)
         self.DEVELOPER_DESKTOP_AVG_POWER_W = self.__get_numeric_assumption(assumptions, 'DEVELOPER_DESKTOP_AVG_POWER_W', 250)
-        self.ARTIFACT_SIZE = self.__get_numeric_assumption(assumptions, 'ARTIFACT_SIZE', 0)
 
         # Assuming 10 hours of work per developer per month (open source contributors may work less than full-time)
         self.DEVELOPER_WORK_HOURS_PER_MONTH = self.__get_numeric_assumption(assumptions, 'DEVELOPER_WORK_HOURS_PER_MONTH', 10)
 
-        """
-        Client device mix for Usage Phase: 75% laptop, 25% desktop, consistent
-        with developer machine assumptions in the Development Phase.
-        For CLI tools / libraries the end-user is almost always a developer.
-        (Ferreira & Domingos, 2025), https://doi.org/10.3390/su17104455
-        """
-        self.CLIENT_LAPTOP_PERCENT = self.__get_numeric_assumption(assumptions, 'CLIENT_LAPTOP_PERCENT',  0.75)
+
+        self.CLIENT_LAPTOP_PERCENT = self.__get_numeric_assumption(assumptions, 'CLIENT_LAPTOP_PERCENT',  0.45)
         self.CLIENT_DESKTOP_PERCENT = self.__get_numeric_assumption(assumptions, 'CLIENT_DESKTOP_PERCENT', 0.25)
-        self.CLIENT_MOBILE_OR_TAB_PERCENT = self.__get_numeric_assumption(assumptions, 'CLIENT_MOBILE_OR_TAB_PERCENT', 0.00)
+        self.CLIENT_MOBILE_OR_TAB_PERCENT = self.__get_numeric_assumption(assumptions, 'CLIENT_MOBILE_OR_TAB_PERCENT', 0.30)
 
         """
         Average power consumption per client device:
@@ -290,7 +284,7 @@ class SoftwareCarbonEmission:
         decline rate is 3.2% (IEA Electricity 2026, https://www.iea.org/reports/electricity-2026)
         """
         CI_BASE_INTENSITY = 390    # gCO2eq per kWh
-        CI_ANNUAL_DECLINE    = 0.032  # 3.2%
+        CI_ANNUAL_DECLINE = 0.032  # 3.2%
         CI_BASE_YEAR = 2025
 
         ci_grid_intensity = CI_BASE_INTENSITY
@@ -318,7 +312,7 @@ class SoftwareCarbonEmission:
         OTHER_NETWORK_DATA = 0.15
 
         # Data Transfer (GB) = (Repo Size + Dependency Size + Docker Image Size + Artifact Size + Other) × Total CI Runs
-        total_data_transfer_gb = ((self.repo_size_gb + self.dependency_size_gb + self.docker_image_size_gb + self.ARTIFACT_SIZE + OTHER_NETWORK_DATA) * self.total_ci_runs)
+        total_data_transfer_gb = ((self.repo_size_gb + self.dependency_size_gb + self.docker_image_size_gb + self.avg_artifact_size_gb + OTHER_NETWORK_DATA) * self.total_ci_runs)
 
         data_transfer_energy = total_data_transfer_gb * self.ELECTRICITY_PER_GB
 
@@ -420,8 +414,8 @@ class SoftwareCarbonEmission:
         """
         total_server_hours = self.server_uptime_hours_per_month * self.months
 
-        # server operational energy = server_uptime_hours_per_month × months × server_instance_power_w × (SERVER_PUE / 1000)
-        return total_server_hours * self.server_instance_power_w * (self.SERVER_PUE / 1000.0)  # kWh
+        # server operational energy = server_uptime_hours_per_month × months × SERVER_CPU_POWER × (SERVER_PUE / 1000)
+        return total_server_hours * self.SERVER_CPU_POWER * (self.SERVER_PUE / 1000.0)  # kWh
 
     def __get_usage_server_embodied_carbon(self):
 
