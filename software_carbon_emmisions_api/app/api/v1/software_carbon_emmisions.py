@@ -9,7 +9,7 @@ async def calculate_emissions(request: SoftwareCarbonEmissionRequest):
     try:
         project_dict = request.model_dump()
         calculator = SoftwareCarbonEmission(
-            *project_dict.values(),
+            **project_dict
         )
         emissions = calculator.calculate_emissions()
         
