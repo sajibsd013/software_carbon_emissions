@@ -14,35 +14,43 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
-          
-      - name: Build And Deploy
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: software_carbon_emissions_app
+
+      - name: Build Nuxt App
+        run: npm run generate
+        working-directory: software_carbon_emissions_app
+
+      - name: Deploy to Azure Static Web Apps
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_DESERT_03EF10E00 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations ######
           app_location: "software_carbon_emissions_app"
-          api_location: "software_carbon_emissions_api"
           output_location: ".output/public"
-          app_build_command: "npm run generate"
-          ###### End of Repository/Build Configurations ######
-        env:
-          NODE_VERSION: "20"          # Important for Nuxt detection
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
+
     steps:
       - name: Close Pull Request
-        id: closepullrequest
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_JOLLY_DESERT_03EF10E00 }}
