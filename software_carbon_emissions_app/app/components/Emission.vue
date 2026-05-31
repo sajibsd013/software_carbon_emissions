@@ -289,7 +289,7 @@ const formData = reactive({
   }
 });
 
-const BASE_URL = 'http://localhost:8000';
+const BASE_URL = import.meta.dev ? 'http://127.0.0.1:8000' : '/api'
 
 const toastRef = ref(null);
 
