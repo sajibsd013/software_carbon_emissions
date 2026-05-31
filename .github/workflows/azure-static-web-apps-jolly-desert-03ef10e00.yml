@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           submodules: true
           lfs: false
@@ -33,6 +33,8 @@ jobs:
           output_location: ".output/public"
           app_build_command: "npm run generate"
           ###### End of Repository/Build Configurations ######
+        env:
+          NODE_VERSION: "20"          # Important for Nuxt detection
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
