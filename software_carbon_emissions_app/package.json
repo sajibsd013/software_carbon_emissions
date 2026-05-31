@@ -1,5 +1,9 @@
 {
   "name": "software_carbon_emission_web",
+  "version": "1.0.0",
+  "engines": {
+    "node": "20.x"
+  },
   "type": "module",
   "private": true,
   "scripts": {
