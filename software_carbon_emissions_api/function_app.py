@@ -1,5 +1,5 @@
 import azure.functions as func
-from .app.main import app 
+from app.main import app 
 
 azure_app = func.AsgiFunctionApp(
     app=app, 
