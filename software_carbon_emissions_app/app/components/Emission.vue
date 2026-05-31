@@ -243,7 +243,7 @@
       <ResultsPanel :results="results" :repo-label="repoLabel" />
     </div>
     <Toast ref="toastRef" />
-    <GithubLoader :isLoading="loading" />
+    <GithubLoader :isLoading="gitLoading" />
 
   </section>
 
@@ -256,6 +256,7 @@ import { ref, reactive } from 'vue';
 const showAssumptions = ref(true);
 const isModalOpen = ref(false);
 const loading = ref(false);
+const gitLoading = ref(false);
 
 const repoLabel = ref('');
 
@@ -306,7 +307,7 @@ const handleFetchGithub = async () => {
     return;
   }
 
-  loading.value = true;
+  gitLoading.value = true;
 
   try {
     const res = await fetch(`${BASE_URL}/api/v1/github-data`, {
@@ -328,12 +329,13 @@ const handleFetchGithub = async () => {
     repoLabel.value = `${owner}/${repo}`;
 
     isModalOpen.value = false;
-    loading.value = false;
+    gitLoading.value = false;
     showToast('GitHub data fetched!', 'success');
   } catch (e) {
     showToast('Fetch failed: ' + e.message);
+    gitLoading.value = false;
   } finally {
-    loading.value = false;
+    gitLoading.value = false;
     isModalOpen.value = false;
 
   }
@@ -372,9 +374,12 @@ const handleCalculateEmissions = async () => {
     if (data.status !== 'success') throw new Error('API error');
 
     results.value = data.results;
+    loading.value = false;
     showToast('Emissions calculated!', 'success');
   } catch (e) {
     showToast('Calculation failed: ' + e.message);
+    loading.value = false;
+
   } finally {
     loading.value = false;
   }
