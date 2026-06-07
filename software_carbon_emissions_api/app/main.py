@@ -19,8 +19,8 @@ app.add_middleware(
 )
 
 # Include the routers from our modular files
-app.include_router(github.router, prefix="/api/v1", tags=["GitHub"])
-app.include_router(software_carbon_emmisions.router, prefix="/api/v1", tags=["Carbon Emissions"])
+app.include_router(github.router, prefix="/v1", tags=["GitHub"])
+app.include_router(software_carbon_emmisions.router, prefix="/v1", tags=["Carbon Emissions"])
 
 @app.get("/")
 def read_root():
