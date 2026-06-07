@@ -310,7 +310,7 @@ const handleFetchGithub = async () => {
   gitLoading.value = true;
 
   try {
-    const res = await fetch(`${BASE_URL}/api/v1/github-data`, {
+    const res = await fetch(`${BASE_URL}/v1/github-data`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ owner, repo, months })
@@ -362,7 +362,7 @@ const handleCalculateEmissions = async () => {
 
     };
 
-    const res = await fetch(`${BASE_URL}/api/v1/calculate-emissions`, {
+    const res = await fetch(`${BASE_URL}/v1/calculate-emissions`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
