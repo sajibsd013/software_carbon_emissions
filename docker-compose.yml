@@ -15,6 +15,7 @@ services:
   app:
     build:
       context: ./software_carbon_emissions_app
+      dockerfile: Dockerfile.dev
     ports:
       - "3000:3000"
     volumes:

@@ -4,12 +4,17 @@ RUN apk add --no-cache libc6-compat
 
 WORKDIR /app
 
+# Install dependencies
 COPY package*.json ./
-# ডকার ইমেজের ভেতরে ক্লিন ইনস্টল
 RUN npm install
 
+# Copy source
 COPY . .
+
+# Build Nuxt app (production build)
+RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host", "--polling"]
+# Start production server
+CMD ["npm", "run", "start"]
