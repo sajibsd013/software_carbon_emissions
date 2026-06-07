@@ -17,4 +17,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start production server
-CMD ["npm", "run", "start"]
+CMD ["npm", "run", "preview"]
