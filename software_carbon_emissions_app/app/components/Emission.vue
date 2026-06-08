@@ -328,7 +328,8 @@ const formData = reactive({
   }
 });
 
-const BASE_URL = 'http://127.0.0.1:8000/v1';
+// const BASE_URL = 'http://127.0.0.1:8000/v1';
+const BASE_URL = '/api/v1';
 const toastRef = ref<any>(null);
 
 const showToast = (msg: string, type = 'error') => {
