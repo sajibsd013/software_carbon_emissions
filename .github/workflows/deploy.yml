@@ -13,6 +13,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
@@ -20,26 +26,22 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       # Build & Push API
-      - name: Build API Image
-        run: |
-          docker build \
-            -t ${{ secrets.DOCKER_USERNAME }}/carbon-api:latest \
-            ./software_carbon_emissions_api
-
-      - name: Push API Image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/carbon-api:latest
+      - name: Build and Push API
+        uses: docker/build-push-action@v6
+        with:
+          context: ./software_carbon_emissions_api
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/carbon-api:latest
 
       # Build & Push APP
-      - name: Build APP Image
-        run: |
-          docker build \
-            -t ${{ secrets.DOCKER_USERNAME }}/carbon-app:latest \
-            ./software_carbon_emissions_app
-
-      - name: Push APP Image
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/carbon-app:latest
+      - name: Build and Push APP
+        uses: docker/build-push-action@v6
+        with:
+          context: ./software_carbon_emissions_app
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ secrets.DOCKER_USERNAME }}/carbon-app:latest
 
   deploy:
     needs: build-and-push
@@ -53,10 +55,12 @@ jobs:
           username: ${{ secrets.AZURE_USER }}
           key: ${{ secrets.AZURE_SSH_KEY }}
           script: |
+            set -e
+
             cd ~/software_carbon_emissions
 
             git pull origin master
-            
+
             docker compose -f docker-compose.cloud.yml pull
 
             docker compose -f docker-compose.cloud.yml up -d --remove-orphans
