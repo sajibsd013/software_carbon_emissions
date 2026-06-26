@@ -327,8 +327,8 @@ class SoftwareCarbonEmission:
 
         # Carbon Emissions per Functional Unit (R) = Total Carbon Emissions / R
         dev_phase_carbon_emissions_per_month_kgCO2eq = dev_phase_total_carbon_emissions_kgCO2eq / self.months # SCI (kgCO2eq/month)
-        dev_phase_carbon_emissions_per_commit_kgCO2eq = dev_phase_total_carbon_emissions_kgCO2eq / self.total_ci_runs # SCI (kgCO2eq/CI run)
-        dev_phase_carbon_emissions_per_ci_kgCO2eq = dev_phase_total_carbon_emissions_kgCO2eq / self.total_commits # SCI (kgCO2eq/commit)
+        dev_phase_carbon_emissions_per_commit_kgCO2eq = dev_phase_total_carbon_emissions_kgCO2eq / self.total_commits # SCI (kgCO2eq/CI run)
+        dev_phase_carbon_emissions_per_ci_kgCO2eq = dev_phase_total_carbon_emissions_kgCO2eq / self.total_ci_runs # SCI (kgCO2eq/commit)
 
         return {
             "dev_phase_carbon_emissions_per_month_kgCO2eq":  dev_phase_carbon_emissions_per_month_kgCO2eq,
